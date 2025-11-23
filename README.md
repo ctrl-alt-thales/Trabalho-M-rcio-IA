@@ -363,6 +363,14 @@ Frase em Linguagem Natural: Se chover ou nevar, então ficar em casa.
 
 ---
 
+## 👥 Autores
+
+- **Felipe Dos Santos Silva** - 25964
+- **Thales Fratarcangeli de Carvalho** - 26342
+- **Maria Gabriela Orlandini** - 25963
+
+---
+
 ## 📝 Notas Finais
 
 Este trabalho demonstra, na prática, como podemos unir sistemas simbólicos e processamento textual moderno para criar agentes inteligentes interpretáveis. A arquitetura construída aplica conceitos fundamentais de Lógica Proposicional, PLN e desenvolvimento Web.
