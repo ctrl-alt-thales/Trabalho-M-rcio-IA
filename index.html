@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Agente NL ↔ CPC</title>
+
+    <!-- Bootstrap (layout básico) -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+    <!-- Fonte do Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap"
+          rel="stylesheet">
+
+    <style>
+        :root {
+            --cor-fundo: #fdf6ff;
+            --cor-card: #ffffff;
+            --cor-primaria: #f8b4d9;   /* rosa pastel */
+            --cor-primaria-hover: #f58ac5;
+            --cor-secundaria: #a6d8ff; /* azul pastel */
+            --cor-secundaria-hover: #7cc3ff;
+            --cor-texto: #4a4a4a;
+            --cor-tabs-bg: #ffe9f3;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Quicksand", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: radial-gradient(circle at top, #ffe9f3 0, #fdf6ff 40%, #e8f7ff 100%);
+            color: var(--cor-texto);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .app-wrapper {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .box {
+            background: var(--cor-card);
+            padding: 28px 22px 24px;
+            border-radius: 26px;
+            box-shadow: 0 18px 45px rgba(0,0,0,0.06);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+        }
+
+        .app-title {
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-align: center;
+            margin-bottom: 4px;
+            font-size: 1.8rem;
+        }
+
+        .app-subtitle {
+            font-size: 0.9rem;
+            text-align: center;
+            color: #7b7b7b;
+            margin-bottom: 18px;
+        }
+
+        .app-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #fff3fb;
+            color: #c96aa0;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .emoji-pill {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffe1f0;
+            font-size: 0.9rem;
+        }
+
+        /* Tabs fofas */
+        .nav-tabs {
+            border: none;
+            background: var(--cor-tabs-bg);
+            border-radius: 999px;
+            padding: 4px;
+            display: inline-flex;
+        }
+
+        .nav-tabs .nav-item {
+            flex: 1 1 auto;
+        }
+
+        .nav-tabs .nav-link {
+            border: none;
+            border-radius: 999px;
+            color: #8a6d93;
+            padding: 8px 18px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .nav-tabs .nav-link.active {
+            background: #ffffff;
+            color: #d14d91;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+        }
+
+        .tab-header {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 18px;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 0.95rem; /* ↑ aumentei um pouco, inclusive "Frase em português" */
+            margin-top: 8px;
+            margin-bottom: 4px;
+        }
+
+        textarea,
+        input {
+            border-radius: 14px !important;
+            border: 1px solid #e6d8ff !important;
+            font-size: 0.9rem !important;
+            padding: 10px 12px !important;
+        }
+
+        textarea:focus,
+        input:focus {
+            border-color: #d6baff !important;
+            box-shadow: 0 0 0 0.2rem rgba(214, 186, 255, 0.35) !important;
+        }
+
+        .btn-fofo-primary {
+            background: var(--cor-primaria);
+            border: none;
+            border-radius: 999px;
+            padding: 8px 22px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #ffffff;
+            box-shadow: 0 8px 16px rgba(248, 180, 217, 0.45);
+        }
+
+        .btn-fofo-primary:hover {
+            background: var(--cor-primaria-hover);
+            color: #ffffff;
+        }
+
+        .btn-fofo-secondary {
+            background: var(--cor-secundaria);
+            border: none;
+            border-radius: 999px;
+            padding: 8px 22px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #ffffff;
+            box-shadow: 0 8px 16px rgba(166, 216, 255, 0.45);
+        }
+
+        .btn-fofo-secondary:hover {
+            background: var(--cor-secundaria-hover);
+            color: #ffffff;
+        }
+
+        .btn-row {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        /* Caixa de resultado – levemente modificada e menor */
+        .resultado-box {
+            margin-top: 14px;
+            border-radius: 18px;
+            background: #fff7fe;
+            border: 1px solid #f0c0ea;
+            padding: 10px 12px;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            max-height: 220px; /* diminuí o tamanho */
+            overflow-y: auto;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert {
+            border-radius: 14px;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+
+        .alert-info {
+            background-color: #e7f3ff;
+            border-color: transparent;
+            color: #3a5675;
+        }
+
+        .alert-success {
+            background-color: #e8fff3;
+            border-color: transparent;
+            color: #2f6b4f;
+        }
+
+        .alert-danger {
+            background-color: #ffe7ec;
+            border-color: transparent;
+            color: #a9445c;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .section-hint {
+            font-size: 0.8rem;
+            color: #8b8b8b;
+            margin-bottom: 12px;
+        }
+
+        /* Títulos internos da resposta (Fórmula em CPC / Mapeamento) */
+        .resp-title {
+            font-family: "Quicksand", system-ui, sans-serif;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #d14d91;
+        }
+
+        @media (max-width: 576px) {
+            .box {
+                padding: 20px 16px 18px;
+                border-radius: 22px;
+            }
+
+            .btn-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn-fofo-primary,
+            .btn-fofo-secondary {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-wrapper">
+    <div class="box">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="app-badge">
+                <span class="emoji-pill"></span>
+                Agente de Lógica NL ↔ CPC
+            </div>
+        </div>
+
+        <h2 class="app-title">Tradutor Lógico</h2>
+        <p class="app-subtitle">
+            Converto frases em português para fórmulas lógicas e vice-versa. 
+        </p>
+
+        <!-- Navegação de abas -->
+        <div class="tab-header">
+            <ul class="nav nav-tabs mb-2" id="tabs">
+                <li class="nav-item">
+                    <button class="nav-link active" id="tab-nl" onclick="showTab('nl')">
+                        Linguagem Natural → CPC
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="tab-cpc" onclick="showTab('cpc')">
+                        CPC → Linguagem Natural
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <!-- NL -> CPC -->
+        <div id="content-nl">
+            <div class="section-title">Linguagem Natural para Cálculo Proposicional</div>
+            <div class="section-hint">
+                Digite uma frase simples em português.<br>
+            </div>
+
+            <label class="mt-2" for="nl-input">-> Frase em português:</label>
+            <textarea id="nl-input" class="form-control" rows="3"
+                      placeholder="Ex.: Kiki come de tudo, mas Kiki não é uma gata."></textarea>
+
+            <div class="btn-row">
+                <button class="btn btn-fofo-primary" onclick="sendNL()">Traduzir para CPC</button>
+            </div>
+
+            <div id="nl-result" class="resultado-box" style="display:none;"></div>
+        </div>
+
+        <!-- CPC -> NL -->
+        <div id="content-cpc" style="display:none;">
+            <div class="section-title">Cálculo Proposicional para Linguagem Natural</div>
+            <div class="section-hint">
+                Informe a fórmula e o que significa cada letra.<br>
+                Ex.: fórmula <code>p^¬q</code> e mapeamento
+                <code>{"p":"Serena é uma gata","q":"Serena come de tudo"}</code>
+            </div>
+
+            <label class="mt-2" for="cpc-input">Fórmula em CPC:</label>
+            <input id="cpc-input" class="form-control" placeholder="Ex.: p^¬q ou (p v q)->r">
+
+            <label class="mt-3" for="cpc-map">Mapeamento (JSON):</label>
+            <textarea id="cpc-map" class="form-control" rows="3"
+                      placeholder='{"p":"Serena é uma gata","q":"Serena come de tudo"}'></textarea>
+
+            <div class="btn-row">
+                <button class="btn btn-fofo-secondary" onclick="sendCPC()">Traduzir para Português</button>
+            </div>
+
+            <div id="cpc-result" class="resultado-box" style="display:none;"></div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const API_BASE = "http://127.0.0.1:5000"; // ajuste se sua API estiver em outro lugar
+
+    function showTab(tab) {
+        document.getElementById("content-nl").style.display = tab === "nl" ? "block" : "none";
+        document.getElementById("content-cpc").style.display = tab === "cpc" ? "block" : "none";
+
+        document.getElementById("tab-nl").classList.toggle("active", tab === "nl");
+        document.getElementById("tab-cpc").classList.toggle("active", tab === "cpc");
+    }
+
+    // NL → CPC
+    function sendNL() {
+        const frase = document.getElementById("nl-input").value;
+        const resultBox = document.getElementById("nl-result");
+        resultBox.style.display = "block";
+
+        if (!frase.trim()) {
+            resultBox.innerHTML = `<div class="alert alert-danger mb-0">Por favor, digite uma frase.</div>`;
+            return;
+        }
+
+        fetch(API_BASE + "/api/nl-to-cpc", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ frase })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (!data.ok) {
+                resultBox.innerHTML = `<div class="alert alert-danger mb-0">${data.erro}</div>`;
+            } else {
+                resultBox.innerHTML = `
+                    <div class="alert alert-info">
+                        <div class="resp-title">Fórmula em CPC:</div>
+                        <code>${data.formula_cpc}</code>
+                    </div>
+                    <div class="alert alert-success mb-0">
+                        <div class="resp-title">Mapeamento:</div>
+                        <pre class="mb-0">${JSON.stringify(data.mapeamento, null, 2)}</pre>
+                    </div>
+                `;
+            }
+        })
+        .catch(err => {
+            resultBox.innerHTML = `<div class="alert alert-danger mb-0">Erro na requisição: ${err}</div>`;
+        });
+    }
+
+    // CPC → NL
+    function sendCPC() {
+        const formula = document.getElementById("cpc-input").value;
+        const mapaRaw = document.getElementById("cpc-map").value;
+        const resultBox = document.getElementById("cpc-result");
+        resultBox.style.display = "block";
+
+        if (!formula.trim()) {
+            resultBox.innerHTML = `<div class="alert alert-danger mb-0">Por favor, digite a fórmula.</div>`;
+            return;
+        }
+
+        let mapeamento = {};
+        try {
+            mapeamento = JSON.parse(mapaRaw);
+        } catch(e) {
+            resultBox.innerHTML = `<div class="alert alert-danger mb-0">Erro no JSON de mapeamento.</div>`;
+            return;
+        }
+
+        fetch(API_BASE + "/api/cpc-to-nl", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ formula, mapeamento })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (!data.ok) {
+                resultBox.innerHTML = `<div class="alert alert-danger mb-0">${data.erro}</div>`;
+            } else {
+                resultBox.innerHTML = `
+                    <div class="alert alert-info mb-0">
+                        <div class="resp-title">Frase em Linguagem Natural:</div>
+                        ${data.frase_nl}
+                    </div>
+                `;
+            }
+        })
+        .catch(err => {
+            resultBox.innerHTML = `<div class="alert alert-danger mb-0">Erro na requisição: ${err}</div>`;
+        });
+    }
+</script>
+
+</body>
+</html>
