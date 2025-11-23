@@ -23,7 +23,7 @@ Este repositório contém um agente inteligente capaz de traduzir frases da Ling
 
 ### Pré-requisitos
 
-- Python 3.7 ou superior
+- Python 3.12 ou superior
 - pip (gerenciador de pacotes Python)
 
 ### Passo a Passo
