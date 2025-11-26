@@ -347,7 +347,15 @@
 </div>
 
 <script>
-    const API_BASE = "http://127.0.0.1:5000"; // ajuste se sua API estiver em outro lugar
+    // Detecta se está rodando localmente ou em produção (ex.: GitHub Pages)
+    // - Em ambiente local: usa o Flask em http://127.0.0.1:5000
+    // - Em produção: ALTERE a constante PROD_API_BASE para a URL pública do seu backend Flask
+    const PROD_API_BASE = "https://SEU_BACKEND_FLASK_AQUI.com"; // TODO: troque para a URL real da API (ex.: https://seu-backend.onrender.com)
+
+    const API_BASE =
+        (location.hostname === "localhost" || location.hostname === "127.0.0.1")
+            ? "http://127.0.0.1:5000"
+            : PROD_API_BASE;
 
     function showTab(tab) {
         document.getElementById("content-nl").style.display = tab === "nl" ? "block" : "none";
