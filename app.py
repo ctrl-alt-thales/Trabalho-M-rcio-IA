@@ -30,15 +30,9 @@ except Exception:
 # 1) Normalização
 # ---------------------------------------------------
 def normalizar_texto_pt(texto: str) -> str:
-    texto = texto.strip()
-    doc = nlp(texto)
-    tokens = [t.text for t in doc]
-    texto_norm = " ".join(tokens).lower()
-
-    texto_norm = texto_norm.replace(" nao ", " não ")
+    texto_norm = texto.lower().strip()
     texto_norm = re.sub(r"\s+", " ", texto_norm)
     return texto_norm
-
 
 # ---------------------------------------------------
 # 2) Conectivos
@@ -278,3 +272,4 @@ if __name__ == "__main__":
     import os
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
