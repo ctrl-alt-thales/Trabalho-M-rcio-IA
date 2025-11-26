@@ -1,6 +1,6 @@
 # app.py
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 
 import re
@@ -375,11 +375,14 @@ def api_cpc_to_nl():
 
 @app.route("/")
 def raiz():
-    return jsonify({
-        "mensagem": "API Lógica NL ↔ CPC rodando.",
-        "endpoints": ["/api/nl-to-cpc", "/api/cpc-to-nl"]
-    })
+    # Em produção (ex.: Render), esta rota serve o arquivo index.html
+    # que está no mesmo diretório do app.py
+    return send_from_directory(".", "index.html")
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Em produção (Render), a porta vem da variável de ambiente PORT.
+    # Localmente, usamos 5000 como padrão.
+    import os
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
